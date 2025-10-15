@@ -12,6 +12,8 @@ import Reports from "./pages/Reports";
 import InvoicePreview from "./pages/InvoicePreview";
 import ItemsMaster from "./pages/ItemsMaster";
 import Chat from "./pages/Chat";
+import TallyImport from "./pages/TallyImport";
+import DemoData from "./pages/DemoData";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -34,6 +36,8 @@ const App = () => (
           <Route path="/master/items" element={<ItemsMaster />} />
           <Route path="/reports/:type" element={<Reports />} />
           <Route path="/invoice/preview" element={<InvoicePreview />} />
+          <Route path="/import/tally" element={<TallyImport />} />
+          <Route path="/tools/demo-data" element={<DemoData />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

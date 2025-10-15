@@ -155,6 +155,12 @@ const Gateway = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Button variant="outline" size="sm" onClick={() => navigate('/import/tally')}>
+                Import Tally
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => navigate('/tools/demo-data')}>
+                Demo Data
+              </Button>
               <Button variant="outline" size="sm" onClick={() => navigate('/invoice/preview')}>
                 Invoice
               </Button>
