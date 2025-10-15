@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Upload, FileText, CheckCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/utils/supabaseHelper";
 
 interface ImportStats {
   items: number;
@@ -80,7 +81,7 @@ const TallyImport = () => {
           description: item.description
         }));
 
-        await supabase.from('items' as any).insert(itemsToInsert as any);
+        await db.from('items').insert(itemsToInsert);
       }
 
       setProgress(75);
@@ -95,7 +96,7 @@ const TallyImport = () => {
           current_balance: parseFloat(ledger.closingBalance || 0)
         }));
 
-        await supabase.from('accounts' as any).insert(accountsToInsert as any);
+        await db.from('accounts').insert(accountsToInsert);
       }
 
       setProgress(85);
@@ -125,10 +126,10 @@ const TallyImport = () => {
           }));
 
         if (clientsToInsert.length > 0) {
-          await supabase.from('clients' as any).insert(clientsToInsert as any);
+          await db.from('clients').insert(clientsToInsert);
         }
         if (vendorsToInsert.length > 0) {
-          await supabase.from('vendors' as any).insert(vendorsToInsert as any);
+          await db.from('vendors').insert(vendorsToInsert);
         }
       }
 

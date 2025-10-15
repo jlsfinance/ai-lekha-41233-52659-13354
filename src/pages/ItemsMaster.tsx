@@ -9,6 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/utils/supabaseHelper";
 import { useToast } from "@/hooks/use-toast";
 
 const ItemsMaster = () => {
@@ -46,7 +47,7 @@ const ItemsMaster = () => {
   }, [navigate]);
 
   const fetchItems = async () => {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from('items')
       .select('*')
       .order('created_at', { ascending: false });
@@ -88,7 +89,7 @@ const ItemsMaster = () => {
       };
 
       if (editingItem) {
-        const { error } = await supabase
+        const { error } = await db
           .from('items')
           .update(itemData)
           .eq('id', editingItem.id);
@@ -100,7 +101,7 @@ const ItemsMaster = () => {
           description: "Item updated successfully",
         });
       } else {
-        const { error } = await supabase
+        const { error } = await db
           .from('items')
           .insert(itemData);
 
@@ -143,7 +144,7 @@ const ItemsMaster = () => {
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this item?')) return;
 
-    const { error } = await supabase.from('items').delete().eq('id', id);
+    const { error } = await db.from('items').delete().eq('id', id);
 
     if (error) {
       toast({

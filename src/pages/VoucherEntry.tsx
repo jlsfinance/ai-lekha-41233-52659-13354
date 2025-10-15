@@ -12,6 +12,7 @@ import { ArrowLeft, CalendarIcon, Save } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/utils/supabaseHelper";
 import { useToast } from "@/hooks/use-toast";
 import { ItemEntryForm, InvoiceItem } from "@/components/ItemEntryForm";
 
@@ -56,10 +57,10 @@ const VoucherEntry = () => {
   }, [navigate]);
 
   const fetchData = async () => {
-    const { data: accountsData } = await supabase.from('accounts').select('*');
-    const { data: clientsData } = await supabase.from('clients').select('*');
-    const { data: vendorsData } = await supabase.from('vendors').select('*');
-    const { data: itemsData } = await supabase.from('items').select('*');
+    const { data: accountsData } = await db.from('accounts').select('*');
+    const { data: clientsData } = await db.from('clients').select('*');
+    const { data: vendorsData } = await db.from('vendors').select('*');
+    const { data: itemsData } = await db.from('items').select('*');
     
     setAccounts(accountsData || []);
     setClients(clientsData || []);
@@ -94,7 +95,7 @@ const VoucherEntry = () => {
       
       const finalAmount = invoiceItems.length > 0 ? totalAmount : parseFloat(formData.amount);
       
-      const { data: transaction, error: txError } = await supabase
+      const { data: transaction, error: txError } = await db
         .from('transactions')
         .insert({
           user_id: user?.id,
@@ -126,7 +127,7 @@ const VoucherEntry = () => {
           amount: item.amount,
         }));
 
-        const { error: itemsError } = await supabase
+        const { error: itemsError } = await db
           .from('invoice_items')
           .insert(itemsToInsert);
 

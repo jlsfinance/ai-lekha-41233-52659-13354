@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { ArrowLeft, Plus, Pencil, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/utils/supabaseHelper";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -51,7 +52,7 @@ const Masters = () => {
     queryKey: [type],
     queryFn: async () => {
       if (!type) return [];
-      const { data, error } = await supabase.from(type as any).select('*').order('created_at', { ascending: false });
+      const { data, error } = await db.from(type).select('*').order('created_at', { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -67,10 +68,10 @@ const Masters = () => {
       const payload = { ...data, user_id: user.id };
       
       if (editingId) {
-        const { error } = await supabase.from(type! as any).update(payload).eq('id', editingId);
+        const { error } = await db.from(type!).update(payload).eq('id', editingId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from(type! as any).insert([payload]);
+        const { error } = await db.from(type!).insert([payload]);
         if (error) throw error;
       }
     },
@@ -89,7 +90,7 @@ const Masters = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from(type! as any).delete().eq('id', id);
+      const { error } = await db.from(type!).delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {

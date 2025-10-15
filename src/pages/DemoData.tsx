@@ -6,6 +6,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ArrowLeft, Database, CheckCircle, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { db } from "@/utils/supabaseHelper";
 import { generateDemoItems, generateDemoParties, generateDemoTransactions, generateDemoInvoiceItems } from "@/utils/demoData";
 
 const DemoData = () => {
@@ -23,34 +24,34 @@ const DemoData = () => {
 
       // Generate and insert items
       const items = generateDemoItems(100);
-      const { data: insertedItems, error: itemsError } = await supabase
-        .from('items' as any)
-        .insert(items.map(item => ({ ...item, user_id: user.id })) as any)
+      const { data: insertedItems, error: itemsError } = await db
+        .from('items')
+        .insert(items.map((item: any) => ({ ...item, user_id: user.id })))
         .select('id');
       
       if (itemsError) throw itemsError;
 
       // Generate and insert clients
       const clients = generateDemoParties(30);
-      const { data: insertedClients, error: clientsError } = await supabase
-        .from('clients' as any)
-        .insert(clients.map(client => ({ ...client, user_id: user.id })) as any)
+      const { data: insertedClients, error: clientsError } = await db
+        .from('clients')
+        .insert(clients.map((client: any) => ({ ...client, user_id: user.id })))
         .select('id');
       
       if (clientsError) throw clientsError;
 
       // Generate and insert vendors
       const vendors = generateDemoParties(20);
-      const { data: insertedVendors, error: vendorsError } = await supabase
-        .from('vendors' as any)
-        .insert(vendors.map(vendor => ({ ...vendor, user_id: user.id })) as any)
+      const { data: insertedVendors, error: vendorsError } = await db
+        .from('vendors')
+        .insert(vendors.map((vendor: any) => ({ ...vendor, user_id: user.id })))
         .select('id');
       
       if (vendorsError) throw vendorsError;
 
       // Get account IDs for transactions
-      const { data: accounts } = await supabase
-        .from('accounts' as any)
+      const { data: accounts } = await db
+        .from('accounts')
         .select('id')
         .eq('user_id', user.id);
 
@@ -58,32 +59,32 @@ const DemoData = () => {
         throw new Error("Need at least 2 accounts. Please check your account setup.");
       }
 
-      const accountIds = (accounts as any[]).map(a => a.id);
-      const clientIds = (insertedClients as any[] || []).map(c => c.id);
-      const vendorIds = (insertedVendors as any[] || []).map(c => c.id);
+      const accountIds = accounts?.map((a: any) => a.id) || [];
+      const clientIds = insertedClients?.map((c: any) => c.id) || [];
+      const vendorIds = insertedVendors?.map((v: any) => v.id) || [];
 
       // Generate and insert transactions
       const transactions = generateDemoTransactions(200, accountIds, clientIds, vendorIds);
-      const { data: insertedTxns, error: txnsError } = await supabase
-        .from('transactions' as any)
-        .insert(transactions.map(txn => ({ ...txn, user_id: user.id })) as any)
+      const { data: insertedTxns, error: txnsError } = await db
+        .from('transactions')
+        .insert(transactions.map((txn: any) => ({ ...txn, user_id: user.id })))
         .select('id, type');
       
       if (txnsError) throw txnsError;
 
       // Generate invoice items for sales and purchase transactions
-      const salesAndPurchaseTxns = (insertedTxns as any[] || []).filter((t: any) => 
+      const salesAndPurchaseTxns = insertedTxns?.filter((t: any) => 
         t.type === 'sales' || t.type === 'purchase'
-      );
+      ) || [];
       
       if (salesAndPurchaseTxns.length > 0 && insertedItems && insertedItems.length > 0) {
-        const itemIds = (insertedItems as any[]).map(i => i.id);
+        const itemIds = insertedItems.map((i: any) => i.id);
         const txnIds = salesAndPurchaseTxns.map((t: any) => t.id);
         const invoiceItems = generateDemoInvoiceItems(txnIds, itemIds);
         
-        const { error: invoiceError } = await supabase
-          .from('invoice_items' as any)
-          .insert(invoiceItems as any);
+        const { error: invoiceError } = await db
+          .from('invoice_items')
+          .insert(invoiceItems);
         
         if (invoiceError) throw invoiceError;
       }
